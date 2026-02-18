@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>What's Around Town — Sales Presentation</title>
+<style>
+/* ── Reset & Base ─────────────────────────────────── */
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#1a1a1a;-webkit-tap-highlight-color:transparent}
+
+/* ── Colors ───────────────────────────────────────── */
+:root{
+  --burgundy:#861f20;--burgundy-dark:#5C1518;--burgundy-deeper:#2A0608;
+  --gold:#E8A020;--gold-dark:#B8860B;
+  --cream:#F8F9FA;--ltrose:#F8E8E8;--divider:#F5C6C6;
+  --dark:#1C2833;--mid:#7F8C8D;
+}
+
+/* ── Slide Container ──────────────────────────────── */
+#deck{position:relative;width:100%;height:100%;overflow:hidden}
+.slide{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .4s ease,transform .4s ease;transform:translateX(60px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.slide.active{opacity:1;pointer-events:auto;transform:translateX(0)}
+.slide.prev{opacity:0;transform:translateX(-60px)}
+
+/* ── Page Layouts ─────────────────────────────────── */
+.page{flex:1;padding:2rem 2.5rem;background:#fff;position:relative}
+.page-dark{background:var(--burgundy);color:#fff}
+.page-deeper{background:var(--burgundy-deeper);color:#fff}
+
+/* Header banner */
+.page-header{background:var(--burgundy);color:#fff;padding:1.8rem 2rem 1.4rem;text-align:center;border-radius:0 0 12px 12px}
+.page-header h1{font-size:2rem;font-weight:800;margin-bottom:.3rem}
+.page-header p{font-size:1rem;color:var(--divider);opacity:.9}
+
+/* Section labels */
+.section-label{font-size:.75rem;font-weight:700;color:var(--gold-dark);text-transform:uppercase;letter-spacing:2px;padding:.5rem 0;border-bottom:2px solid var(--gold);margin:1.5rem 0 1rem;display:flex;align-items:center;gap:.5rem}
+
+/* Stat boxes */
+.stat-row{display:flex;gap:1rem;justify-content:center;margin:1.5rem 0}
+.stat-box{flex:1;max-width:180px;background:var(--burgundy);color:#fff;border-radius:10px;padding:1.2rem .8rem;text-align:center}
+.stat-box .num{font-size:2.5rem;font-weight:800;color:var(--gold)}
+.stat-box .label{font-size:.75rem;margin-top:.3rem;opacity:.85}
+
+/* Cards */
+.card-grid{display:grid;gap:1rem;margin:1rem 0}
+.card-grid.cols-2{grid-template-columns:1fr 1fr}
+.card-grid.cols-3{grid-template-columns:1fr 1fr 1fr}
+.card{border:1.5px solid var(--divider);border-radius:10px;padding:1rem;background:#fff;transition:transform .2s}
+.card:active{transform:scale(.97)}
+.card .badge{display:inline-block;background:var(--burgundy);color:var(--gold);font-size:.65rem;font-weight:700;padding:.2rem .6rem;border-radius:4px;margin-bottom:.4rem;text-transform:uppercase;letter-spacing:1px}
+.card h3{font-size:.9rem;color:var(--burgundy);margin-bottom:.3rem}
+.card p{font-size:.78rem;color:var(--mid);line-height:1.4}
+
+/* Photo grid */
+.photo-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin:1rem 0}
+.photo-frame{border-radius:8px;overflow:hidden;border:1.5px solid var(--divider);cursor:pointer;position:relative}
+.photo-frame img{width:100%;height:160px;object-fit:cover;display:block;transition:transform .3s}
+.photo-frame:active img{transform:scale(1.05)}
+.photo-frame .caption{text-align:center;font-size:.7rem;font-weight:700;color:var(--burgundy);padding:.4rem;background:#fff}
+
+/* Callout banners */
+.callout{border-radius:10px;padding:1.2rem 1.5rem;margin:1rem 0;text-align:center}
+.callout-gold{background:var(--gold);color:var(--burgundy-dark)}
+.callout-burgundy{background:var(--burgundy);color:#fff}
+.callout-teal{background:var(--gold-dark);color:#fff}
+.callout-cream{background:var(--ltrose);color:var(--dark)}
+.callout h3{font-size:1.1rem;font-weight:700;margin-bottom:.3rem}
+.callout p{font-size:.85rem;opacity:.9}
+
+/* Bullet lists */
+.bullet-list{list-style:none;margin:1rem 0}
+.bullet-list li{padding:.7rem 1rem;margin:.4rem 0;background:var(--cream);border-radius:8px;font-size:.85rem;color:var(--dark);display:flex;align-items:start;gap:.6rem}
+.bullet-list li::before{content:'■';color:var(--burgundy);font-size:.6rem;margin-top:.2rem;flex-shrink:0}
+.bullet-list li strong{color:var(--burgundy)}
+
+/* Steps */
+.steps{counter-reset:step;margin:1rem 0}
+.step{display:flex;gap:1rem;align-items:start;padding:1rem;margin:.6rem 0;background:var(--cream);border-radius:10px}
+.step::before{counter-increment:step;content:counter(step);background:var(--gold-dark);color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;flex-shrink:0}
+.step h3{font-size:.95rem;color:var(--burgundy);margin-bottom:.2rem}
+.step p{font-size:.82rem;color:var(--mid);line-height:1.4}
+
+/* ROI Table */
+.roi-table{width:100%;border-collapse:collapse;font-size:.78rem;margin:1rem 0}
+.roi-table th{background:var(--burgundy-dark);color:#fff;padding:.6rem .4rem;text-align:center;font-size:.7rem}
+.roi-table td{padding:.5rem .4rem;text-align:center;border-bottom:1px solid var(--divider)}
+.roi-table tr:nth-child(even){background:var(--ltrose)}
+.roi-table tr.highlight td{background:var(--gold);color:var(--burgundy-dark);font-weight:700}
+.roi-table td.col-highlight{font-weight:700;color:var(--burgundy)}
+
+/* Pillar cards (About page) */
+.pillar-row{display:flex;gap:.8rem;margin:1rem 0}
+.pillar{flex:1;background:var(--burgundy);border-radius:10px;padding:1.2rem .8rem;text-align:center;color:#fff}
+.pillar .top-label{font-size:.75rem;opacity:.85;margin-bottom:.2rem}
+.pillar .mid-label{font-size:.7rem;color:var(--gold);font-weight:700;margin-bottom:.2rem}
+.pillar .big-num{font-size:1.8rem;font-weight:800;color:var(--gold)}
+
+/* Q&A */
+.qa-item{margin:.6rem 0}
+.qa-q{background:var(--burgundy);color:#fff;padding:.6rem 1rem;border-radius:8px 8px 0 0;font-weight:700;font-size:.85rem;display:flex;align-items:center;gap:.5rem;cursor:pointer}
+.qa-q::before{content:'Q';background:var(--gold);color:var(--burgundy-dark);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;flex-shrink:0}
+.qa-a{background:var(--cream);padding:.7rem 1rem .7rem 2.8rem;border-radius:0 0 8px 8px;font-size:.82rem;color:var(--dark);line-height:1.5;position:relative}
+.qa-a::before{content:'A';position:absolute;left:.8rem;top:.7rem;background:var(--gold-dark);color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800}
+
+/* Rate card table */
+.rate-table{width:100%;border-collapse:collapse;margin:1rem 0}
+.rate-table th{background:var(--burgundy-dark);color:#fff;padding:.8rem;font-size:.85rem}
+.rate-table td{padding:.8rem;text-align:center;font-size:.95rem;border-bottom:1px solid var(--divider)}
+.rate-table tr:nth-child(odd) td{background:var(--cream)}
+.rate-table .price{color:var(--gold-dark);font-weight:800;font-size:1.1rem}
+
+/* Checklist */
+.checklist{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin:.8rem 0}
+.check-item{display:flex;align-items:center;gap:.5rem;padding:.5rem .8rem;background:var(--ltrose);border-radius:6px;font-size:.8rem;color:var(--dark)}
+.check-item::before{content:'✓';color:var(--burgundy);font-weight:800}
+
+/* Cover page */
+.cover{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:3rem 2rem;min-height:100%}
+.cover img.logo{width:220px;margin-bottom:1.5rem}
+.cover h1{font-size:2.5rem;font-weight:800;margin-bottom:.5rem}
+.cover .subtitle{font-size:1.1rem;color:var(--gold);font-weight:600;margin-bottom:1rem}
+.cover .divider{width:200px;height:2px;background:var(--gold-dark);margin:1rem auto}
+.cover .tagline{font-size:1rem;opacity:.8;margin-bottom:.3rem}
+.cover .bold-line{font-size:1.4rem;font-weight:800;letter-spacing:1px;margin:.5rem 0}
+.cover .since{font-size:.85rem;opacity:.7;margin-top:.5rem}
+.cover .categories{margin:1.5rem 0;font-size:.9rem;opacity:.8}
+.cover .contact-block{margin-top:2rem;opacity:.9}
+.cover .contact-block .name{font-size:1.1rem;font-weight:700}
+.cover .contact-block a{color:var(--gold);text-decoration:none}
+.cover .contact-block p{font-size:.85rem;margin:.2rem 0}
+
+/* Get Started page */
+.cta-steps{display:flex;gap:1rem;margin:1.5rem 0}
+.cta-step{flex:1;background:var(--burgundy-dark);border-radius:12px;padding:1.2rem 1rem;text-align:center;color:#fff}
+.cta-step .num{width:40px;height:40px;background:var(--gold);color:var(--burgundy-dark);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800;margin:0 auto .6rem}
+.cta-step h3{font-size:.95rem;margin-bottom:.3rem}
+.cta-step p{font-size:.78rem;opacity:.8;line-height:1.3}
+
+.contact-card{background:var(--burgundy-deeper);border-radius:12px;padding:1.5rem;text-align:center;margin:1.5rem 0}
+.contact-card .name{font-size:1.3rem;font-weight:700;color:var(--gold)}
+.contact-card .title-line{font-size:.9rem;opacity:.8;margin-bottom:1rem}
+.contact-info{display:grid;gap:.8rem;margin:1rem 0}
+.contact-info a{display:block;color:#fff;text-decoration:none;font-size:1.1rem;font-weight:600;padding:.5rem;border-radius:8px;transition:background .2s}
+.contact-info a:active{background:rgba(255,255,255,.1)}
+.contact-info .label{font-size:.65rem;color:var(--gold-dark);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:.1rem}
+
+/* Navigation */
+.nav-dots{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:100;background:rgba(0,0,0,.5);padding:6px 12px;border-radius:20px}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;transition:all .3s}
+.nav-dot.active{background:var(--gold);width:24px;border-radius:4px}
+
+.nav-arrows{position:fixed;top:50%;z-index:100;transform:translateY(-50%)}
+.nav-arrow{width:40px;height:40px;border:none;border-radius:50%;background:rgba(0,0,0,.4);color:#fff;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.nav-arrow:active{background:var(--burgundy);transform:scale(.9)}
+#prevBtn{position:fixed;left:8px;top:50%;transform:translateY(-50%);z-index:100}
+#nextBtn{position:fixed;right:8px;top:50%;transform:translateY(-50%);z-index:100}
+.nav-arrow[disabled]{opacity:.2;pointer-events:none}
+
+/* Page counter */
+.page-counter{position:fixed;top:10px;right:14px;z-index:100;font-size:.7rem;color:rgba(255,255,255,.6);background:rgba(0,0,0,.4);padding:3px 10px;border-radius:10px}
+
+/* Lightbox */
+.lightbox{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.92);z-index:200;display:none;align-items:center;justify-content:center;cursor:pointer}
+.lightbox.open{display:flex}
+.lightbox img{max-width:92%;max-height:92%;object-fit:contain;border-radius:8px}
+
+/* Animated counters */
+.counter{display:inline-block}
+
+/* Print + Digital comparison */
+.compare-row{display:flex;gap:1rem;margin:1rem 0}
+.compare-box{flex:1;border-radius:10px;padding:1rem;text-align:center}
+.compare-box.print-box{background:var(--burgundy);color:#fff}
+.compare-box.digital-box{background:var(--gold-dark);color:#fff}
+.compare-box h3{font-size:.95rem;margin-bottom:.5rem}
+.compare-box p{font-size:.78rem;opacity:.9;line-height:1.5}
+.compare-plus{display:flex;align-items:center;font-size:1.5rem;font-weight:800;color:var(--gold)}
+
+/* Footer */
+.page-footer{position:absolute;bottom:0;left:0;right:0;background:var(--burgundy);color:#fff;padding:.4rem 1.5rem;display:flex;justify-content:space-between;font-size:.65rem;opacity:.8}
+
+/* Quote block */
+.quote-block{background:var(--cream);border-radius:10px;padding:1rem 1.2rem;margin:1rem 0;border-left:4px solid var(--gold)}
+.quote-block p{font-style:italic;font-size:.85rem;color:var(--dark);line-height:1.5}
+.quote-block .attr{font-style:normal;font-weight:700;font-size:.75rem;color:var(--gold-dark);margin-top:.4rem}
+
+/* Responsive - tablet optimized */
+@media(min-width:768px){
+  .page{padding:2.5rem 3rem}
+  .page-header h1{font-size:2.4rem}
+  .stat-box .num{font-size:3rem}
+  .pillar .big-num{font-size:2.2rem}
+  .photo-frame img{height:200px}
+}
+@media(max-width:600px){
+  .page{padding:1.2rem 1rem}
+  .page-header{padding:1.2rem 1rem}
+  .page-header h1{font-size:1.5rem}
+  .photo-grid{grid-template-columns:1fr 1fr}
+  .compare-row{flex-direction:column}
+  .cta-steps{flex-direction:column}
+  .pillar-row{flex-direction:column}
+  .checklist{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- Lightbox for photos -->
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('open')">
+  <img id="lightbox-img" src="" alt="Full view">
+</div>
+
+<!-- Navigation -->
+<button class="nav-arrow" id="prevBtn" onclick="go(-1)">‹</button>
+<button class="nav-arrow" id="nextBtn" onclick="go(1)">›</button>
+<div class="page-counter" id="pageCounter">1 / 12</div>
+<div class="nav-dots" id="navDots"></div>
+
+<div id="deck">
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- PAGE 1: COVER -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="slide active" data-page="1">
+  <div class="page page-dark cover">
+    <div style="width:100%;height:4px;background:var(--gold);border-radius:2px;margin-bottom:2rem"></div>
+    <img class="logo" src="assets/logo-2022-Inverted.png" alt="What's Around Town">
+    <h1>What's Around Town</h1>
+    <p class="subtitle">Local Eats, Shopping &amp; Entertainment</p>
+    <div class="divider"></div>
+    <p class="tagline">Hotel Guest Information Directory</p>
+    <p class="bold-line">SALES PRESENTATION</p>
+    <p class="since">US Guest Services, LLC — Serving Hospitality Since 1999</p>
+    <p class="categories">★ Hotels · Dining · Shopping · Entertainment · Travel ★</p>
+    <div class="contact-block">
+      <p class="name">Jack Scotto, President</p>
+      <p><a href="tel:4124156156">412-415-6156</a> | <a href="tel:4128943320">412-894-3320</a></p>
+      <p><a href="mailto:usguestservicesllc@gmail.com">usguestservicesllc@gmail.com</a></p>
+      <p><a href="https://whatsaroundtown.info" target="_blank">whatsaroundtown.info</a> | <a href="https://usguestservices.net" target="_blank">usguestservices.net</a></p>
+      <p style="font-size:.75rem;opacity:.6;margin-top:.3rem">717 Stockton Ridge, Cranberry Twp, PA 16066</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- PAGE 2: THE OPPORTUNITY -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" data-page="2">
+  <div class="page">
+    <div class="page-header"><h1>Why Hotel Guest Advertising?</h1><p>The opportunity is bigger than you think</p></div>
+    <div style="padding:1.5rem 0">
+      <p style="font-size:.9rem;color:var(--dark);line-height:1.6;margin-bottom:1rem">When hotel guests check in, they're ready to spend. They need restaurants, entertainment, shopping, and services — and they trust the hotel staff to point them in the right direction. That's where YOUR business comes in.</p>
+      
+      <div class="stat-row">
+        <div class="stat-box"><div class="num counter" data-target="313" data-prefix="$">$0</div><div class="label">avg. traveler spend/day</div></div>
+        <div class="stat-box"><div class="num counter" data-target="78" data-suffix="%">0%</div><div class="label">avg. hotel occupancy</div></div>
+        <div class="stat-box"><div class="num counter" data-target="1.7" data-decimal="true">0</div><div class="label">guests per room</div></div>
+      </div>
+
+      <div class="section-label">The Math Is Simple</div>
+      <div class="callout callout-cream" style="text-align:left">
+        <p><strong>100 rooms × 78% occupancy × 1.7 guests × 365 days</strong><br><strong style="color:var(--burgundy);font-size:1.1rem">= 48,000 guests per hotel, per year</strong></p>
+      </div>
+      <div class="callout callout-cream" style="text-align:left">
+        <p><strong>Just 5 hotels in the WAT network</strong><br><strong style="color:var(--burgundy);font-size:1.1rem">= 240,000+ guests per year looking for YOUR services</strong></p>
+      </div>
+      <div class="callout callout-cream" style="text-align:left">
+        <p><strong>Up to 8–12 hotels in some markets</strong><br><strong style="color:var(--burgundy);font-size:1.1rem">= 384,000–576,000+ potential customer impressions annually</strong></p>
+      </div>
+
+      <div class="section-label">Why This Audience Is Gold</div>
+      <ul class="bullet-list">
+        <li><strong>Captive audience</strong> — guests are away from home and NEED local recommendations</li>
+        <li><strong>High trust factor</strong> — hotel staff acts as a personal concierge and trusted advisor</li>
+        <li><strong>Ready to spend</strong> — travelers budget for dining, entertainment, and services</li>
+        <li><strong>No competition at home</strong> — your ad isn't buried among local competitors</li>
+        <li><strong>24/7 access</strong> — the directory is in the room and at the front desk all year long</li>
+      </ul>
+
+      <div class="callout callout-gold">
+        <h3>The average hotel guest spends $313 per day</h3>
+        <p>on local dining, shopping, and entertainment. — Source: U.S. Travel Association</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- PAGE 3: ABOUT US GUEST SERVICES -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" data-page="3">
+  <div class="page">
+    <div class="page-header"><h1>About US Guest Services</h1><p>America's Most Celebrated Publisher of Custom Hospitality Guides</p></div>
+    <div style="padding:1.5rem 0">
+      <div class="callout callout-burgundy">
+        <h3>Trusted by 1,100+ businesses across the United States since 1999</h3>
+      </div>
+
+      <div class="pillar-row">
+        <div class="pillar">
+          <div class="top-label">In Business Since</div>
+          <div class="mid-label">EST.</div>
+          <div class="big-num counter" data-target="1999" data-no-comma="true">0</div>
+        </div>
+        <div class="pillar">
+          <div class="top-label">Satisfied Clients</div>
+          <div class="mid-label">OVER</div>
+          <div class="big-num"><span class="counter" data-target="1100">0</span>+</div>
+        </div>
+        <div class="pillar">
+          <div class="top-label">Most Clients Renew</div>
+          <div class="mid-label">RENEW</div>
+          <div class="big-num" style="font-size:1.3rem">Year After Year</div>
+        </div>
+      </div>
+
+      <div class="section-label">Our Products &amp; Services</div>
+      <ul class="bullet-list">
+        <li><strong>In-Room Guest Directories</strong> — Custom-designed hotel directories placed directly in guest rooms</li>
+        <li><strong>What's Around Town Guides</strong> — Community guides covering dining, shopping &amp; entertainment within 3–4 miles</li>
+        <li><strong>Digital Directories</strong> — Online presence at whatsaroundtown.info — searchable by guests 24/7</li>
+        <li><strong>Touch Screen Kiosks</strong> — Interactive lobby kiosks for modern hotel properties</li>
+        <li><strong>Professional Ad Design</strong> — Full ad design services included with every advertising package</li>
+      </ul>
+
+      <div class="quote-block">
+        <p><em>OUR MISSION:</em> "To achieve the highest possible standards in the publication of custom hospitality guides, enabling customers to enhance the perception of their business and reach their sales targets."</p>
+      </div>
+
+      <div class="section-label">Why Hotels Choose Us</div>
+      <ul class="bullet-list">
+        <li><strong>FREE to hotels</strong> — directories provided at no cost to hotel properties</li>
+        <li><strong>Professional quality</strong> — enhances the guest experience and hotel reputation</li>
+        <li><strong>Maintained regularly</strong> — we update and restock directories on schedule</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- PAGE 4: SEEN IN ACTION -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" data-page="4">
+  <div class="page">
+    <div class="page-header"><h1>Seen In Action</h1><p>Real placements in hotels and local businesses</p></div>
+    <div style="padding:1.5rem 0">
+      <div class="section-label">Your Ad in Premium Hotel Lobbies</div>
+      <div class="photo-grid">
+        <div class="photo-frame" onclick="openLightbox(this)">
+          <img src="assets/photos/hilton-home2.jpg" alt="Home2 Suites by Hilton">
+          <div class="caption">Home2 Suites by Hilton</div>
+        </div>
+        <div class="photo-frame" onclick="openLightbox(this)">
+          <img src="assets/photos/hilton-canonsburg.jpg" alt="Hilton — Canonsburg, PA">
+          <div class="caption">Hilton — Canonsburg, PA</div>
+        </div>
+        <div class="photo-frame" onclick="openLightbox(this)">
+          <img src="assets/photos/marriott-bonvoy.jpg" alt="Marriott Bonvoy Property">
+          <div class="caption">Marriott Bonvoy Property</div>
+        </div>
+      </div>
+
+      <div class="callout callout-burgundy">
+        <h3>WAT directories are placed at the front desk of major hotel brands</h3>
+        <p>Hilton · Marriott · Hampton Inn · Home2 Suites · Garden Inn · and more</p>
+      </div>
+
+      <div class="section-label">Window Sticker Program — Beyond the Hotel</div>
+      <div class="photo-grid">
+        <div class="photo-frame" onclick="openLightbox(this)">
+          <img src="assets/photos/plaza-azteca.jpg" alt="Plaza Azteca Restaurant">
+          <div class="caption">Plaza Azteca Restaurant</div>
+        </div>
+        <div class="photo-frame" onclick="openLightbox(this)">
+          <img src="assets/photos/miones-pizza.jpg" alt="Mione's Pizza">
+          <div class="caption">Mione's Pizza</div>
+        </div>
+        <div class="photo-frame" onclick="openLightbox(this)">
+          <img src="assets/photos/deejays-bbq.jpg" alt="Dee Jay's BBQ Ribs & Grille">
+          <div class="caption">Dee Jay's BBQ Ribs &amp; Grille</div>
+        </div>
+      </div>
+
+      <div class="callout callout-cream">
+        <h3 style="color:var(--burgundy)">Every participating business becomes a gateway to every other business in the network.</h3>
+        <p style="color:var(--mid)">Visitors don't need to be hotel guests — anyone can scan a window sticker to discover local businesses.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- PAGE 5: HOW WAT WORKS -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" data-page="5">
+  <div class="page">
+    <div class="page-header"><h1>How What's Around Town Works</h1><p>A proven system that connects hotel guests to local businesses</p></div>
+    <div style="padding:1.5rem 0">
+      <div class="callout callout-cream">
+        <p style="font-style:italic;color:var(--dark)">💬 Think of this guide as a glamorous, more localized directory leading guests directly to your establishment.</p>
+      </div>
+
+      <div class="section-label">Distribution &amp; Placement</div>
+      <div class="steps">
+        <div class="step"><div><h3>Distribution to Hotels</h3><p>WAT guides are distributed FREE to 4–7 major hotels in the area — at no cost to the hotel.</p></div></div>
+        <div class="step"><div><h3>Strategic Placement</h3><p>Guides are placed at the front desk, guest rooms, lobby, meeting rooms, and banquet facilities.</p></div></div>
+        <div class="step"><div><h3>Year-Round Reference</h3><p>The guide serves as an all-year reference covering local businesses within a 3–4 mile radius.</p></div></div>
+        <div class="step"><div><h3>Trusted Recommendations</h3><p>Hotel staff uses the guide daily to answer guest questions about dining, shopping &amp; entertainment.</p></div></div>
+        <div class="step"><div><h3>Digital Reach</h3><p>Your ad also appears on whatsaroundtown.info — searchable by guests before and during their stay.</p></div></div>
+      </div>
+
+      <div class="section-label">Print + Digital = Maximum Exposure</div>
+      <div class="compare-row">
+        <div class="compare-box print-box">
+          <h3>■ PRINT DIRECTORY</h3>
+          <p>Physical guide in every hotel<br>Front desk &amp; in-room placement<br>Year-round, 24/7 access<br>Trusted by hotel staff daily<br>Up to 12 hotels in your market</p>
+        </div>
+        <div class="compare-plus">+</div>
+        <div class="compare-box digital-box">
+          <h3>■ DIGITAL DIRECTORY</h3>
+          <p>Listed on whatsaroundtown.info<br>Searchable before &amp; during stay<br>Mobile-friendly for travelers<br>Extended reach beyond hotels<br>Click-to-call &amp; Google Reviews</p>
+        </div>
+      </div>
+
+      <div class="callout callout-cream">
+        <h3 style="color:var(--burgundy)">Hotels love WAT because it enhances the guest experience — and it's completely FREE to them.</h3>
+        <p style="color:var(--mid)">No cost to the hotel. Maximum value to advertisers. Every guest is a potential customer.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- PAGE 6: DIGITAL STOREFRONT -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" data-page="6">
+  <div class="page">
+    <div class="page-header"><h1>Beyond the Directory: Your Digital Storefront</h1><p>whatsaroundtown.info puts your business in every guest's pocket — 24/7</p></div>
+    <div style="padding:1.5rem 0">
+      <div class="callout callout-burgundy">
+        <h3>"Your competitors are in a binder. You're in their pocket."</h3>
+        <p>Every WAT advertiser gets a full digital listing — included with your print ad.</p>
+      </div>
+
+      <div class="card-grid cols-3">
+        <div class="card"><span class="badge">★ Reviews</span><h3>Google Reviews</h3><p>Star rating shown prominently. Guests see your reputation before they leave the hotel.</p></div>
+        <div class="card"><span class="badge">WWW</span><h3>Direct Website Link</h3><p>One tap to your website, online ordering, or reservation system. Straight to your door.</p></div>
+        <div class="card"><span class="badge">Call</span><h3>Click-to-Call</h3><p>One tap calls you directly — no searching, no typing phone numbers manually.</p></div>
+        <div class="card"><span class="badge">Map</span><h3>Maps &amp; Directions</h3><p>Exact location with one-tap navigation. No more "where is that place exactly?"</p></div>
+        <div class="card"><span class="badge">Mobile</span><h3>Mobile-Optimized</h3><p>Looks great on any phone or tablet. Guests browse listings from their hotel room.</p></div>
+        <div class="card"><span class="badge">City</span><h3>City Guide Pages</h3><p>Featured in curated city guides with local tips, highlights, and best-of context.</p></div>
+        <div class="card"><span class="badge">QR</span><h3>QR Code Bridge</h3><p>Print directories include QR codes linking guests directly to your digital listing.</p></div>
+        <div class="card"><span class="badge">Data</span><h3>Listing Analytics</h3><p>See exactly how many guests view your listing via your advertiser dashboard.</p></div>
+      </div>
+
+      <div class="compare-row">
+        <div class="compare-box print-box"><h3>[ PRINT DIRECTORY ]</h3><p>In-room binder · Front desk · Static<br>Great reach within the hotel</p></div>
+        <div class="compare-plus">+</div>
+        <div class="compare-box digital-box"><h3>[ DIGITAL LISTING ]</h3><p>Mobile · Click-to-call · Live reviews · Maps<br>Reaches guests before, during &amp; after their stay</p></div>
+      </div>
+
+      <div class="callout callout-gold">
+        <h3>One investment. Two powerful channels. Unlimited guest impressions.</h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- PAGE 7: BENEFITS -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" data-page="7">
+  <div class="page">
+    <div class="page-header"><h1>Benefits for Advertisers</h1><p>Why smart local businesses choose What's Around Town</p></div>
+    <div style="padding:1.5rem 0">
+      <div class="callout callout-gold">
+        <h3>For as little as $795/year</h3>
+        <p>year-round advertising to hotel guests</p>
+      </div>
+
+      <div class="card-grid cols-2">
+        <div class="card"><span class="badge" style="font-size:.9rem">365</span><h3>Year-Round Exposure</h3><p>Not a one-day newspaper ad. Your business is visible 365 days a year.</p></div>
+        <div class="card"><span class="badge">EXCL</span><h3>Exclusive Placement</h3><p>Limited spots per category — no ad appears next to a direct competitor.</p></div>
+        <div class="card"><span class="badge">REF</span><h3>Trusted Referrals</h3><p>Hotel staff actively recommends advertisers to guests who ask.</p></div>
+        <div class="card"><span class="badge">P+D</span><h3>Print + Digital</h3><p>Physical directory plus your listing on whatsaroundtown.info.</p></div>
+        <div class="card"><span class="badge">FREE</span><h3>Ad Design Included</h3><p>We design your professional advertisement at no extra charge.</p></div>
+        <div class="card"><span class="badge">ALL</span><h3>Corporate &amp; Leisure</h3><p>Reach business travelers AND vacation guests — both ready to spend.</p></div>
+      </div>
+
+      <div class="callout callout-cream">
+        <p style="color:var(--dark)">Your competitors may already be in the guide. Don't let them have the advantage.</p>
+        <h3 style="color:var(--burgundy)">Advertising space is LIMITED — only one business per category per guide.</h3>
+      </div>
+
+      <div class="quote-block">
+        <p>"We've been advertising with US Guest Services for years. The exposure to hotel guests has brought us customers we never would have reached otherwise."</p>
+        <div class="attr">— Satisfied WAT Advertiser</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- PAGE 8: ROI -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" data-page="8">
+  <div class="page">
+    <div class="page-header"><h1>Your Return on Investment</h1><p>The Numbers Speak for Themselves</p></div>
+    <div style="padding:1.5rem 0">
+      <div class="callout callout-burgundy">
+        <p>240,000 guests/year × avg. $25 ticket × just 10 customers/day</p>
+        <h3 style="font-size:1.8rem;color:var(--gold)">= $91,250.00 Annual ROI</h3>
+      </div>
+
+      <div class="section-label">ROI Projection Table — Annual Revenue by Daily Patrons × Avg. Purchase</div>
+      <div style="overflow-x:auto">
+        <table class="roi-table">
+          <thead><tr><th>Avg. Purchase</th><th>1/Day</th><th>5/Day</th><th>10/Day</th><th>15/Day</th><th>20/Day</th></tr></thead>
+          <tbody>
+            <tr><td><strong>$5</strong></td><td>$1,825</td><td>$9,125</td><td class="col-highlight">$18,250</td><td>$27,375</td><td>$36,500</td></tr>
+            <tr><td><strong>$7</strong></td><td>$2,555</td><td>$12,775</td><td class="col-highlight">$25,550</td><td>$38,325</td><td>$51,100</td></tr>
+            <tr><td><strong>$9</strong></td><td>$3,285</td><td>$16,425</td><td class="col-highlight">$32,850</td><td>$49,275</td><td>$65,700</td></tr>
+            <tr><td><strong>$11</strong></td><td>$4,015</td><td>$20,075</td><td class="col-highlight">$40,150</td><td>$60,225</td><td>$80,300</td></tr>
+            <tr><td><strong>$13</strong></td><td>$4,745</td><td>$23,725</td><td class="col-highlight">$47,450</td><td>$71,175</td><td>$94,900</td></tr>
+            <tr><td><strong>$15</strong></td><td>$5,475</td><td>$27,375</td><td class="col-highlight">$54,750</td><td>$82,125</td><td>$109,500</td></tr>
+            <tr><td><strong>$17</strong></td><td>$6,205</td><td>$31,025</td><td class="col-highlight">$62,050</td><td>$93,075</td><td>$124,100</td></tr>
+            <tr><td><strong>$19</strong></td><td>$6,935</td><td>$34,675</td><td class="col-highlight">$69,350</td><td>$104,025</td><td>$138,700</td></tr>
+            <tr><td><strong>$21</strong></td><td>$7,665</td><td>$38,325</td><td class="col-highlight">$76,650</td><td>$114,975</td><td>$153,300</td></tr>
+            <tr><td><strong>$23</strong></td><td>$8,395</td><td>$41,975</td><td class="col-highlight">$83,950</td><td>$125,925</td><td>$167,900</td></tr>
+            <tr class="highlight"><td><strong>$25</strong></td><td>$9,125</td><td>$45,625</td><td class="col-highlight">$91,250</td><td>$136,875</td><td>$182,500</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:.7rem;color:var(--mid)">* Highlighted column = 10 patrons/day example | Highlighted row = $25 avg. purchase</p>
+
+      <div class="callout callout-gold">
+        <p>Your advertising investment: as little as $66.25/month | Potential return: tens of thousands of dollars</p>
+        <h3>That's less than what most businesses spend on coffee for the break room!</h3>
+      </div>
+
+      <div class="section-label">What This Means For Your Business</div>
+      <div class="callout callout-cream">
+        <h3 style="color:var(--burgundy)">Even at the lowest tier — a Quarter Page at $795/year — you're paying just $2.18 per day</h3>
+        <p style="color:var(--dark)">to be visible to thousands of hotel guests. If just ONE customer finds you through the directory each week, the ad pays for itself many times over.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- PAGE 9: CREDIBILITY -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" data-page="9">
+  <div class="page">
+    <div class="page-header"><h1>Credibility &amp; Trust</h1><p>25+ years of proven performance in the hospitality industry</p></div>
+    <div style="padding:1.5rem 0">
+      <div style="display:flex;gap:1rem;margin:1rem 0">
+        <div class="stat-box" style="flex:1;padding:1.5rem"><div class="num" style="font-size:3.5rem">A+</div><div class="label">Better Business Bureau Rating</div></div>
+        <div class="stat-box" style="flex:1;padding:1.5rem;background:var(--gold-dark)"><div class="num" style="font-size:3.5rem;color:#fff">100</div><div class="label">Dun &amp; Bradstreet<br>PAYDEX Score — Perfect 100/A</div></div>
+      </div>
+
+      <div class="section-label">A Track Record You Can Count On</div>
+      <ul class="bullet-list">
+        <li><strong>No Judgments</strong> — Zero legal judgments against US Guest Services, LLC</li>
+        <li><strong>No Liens</strong> — Clean financial record — no outstanding liens or encumbrances</li>
+        <li><strong>No Lawsuits</strong> — No pending or historical litigation</li>
+        <li><strong>1,100+ Clients</strong> — More than eleven hundred businesses have trusted us — most renew year after year</li>
+        <li><strong>Since 1999</strong> — Over 25 years of serving the hospitality industry across the United States</li>
+      </ul>
+
+      <div class="quote-block">
+        <p>"Our experience in hospitality publications since 1999 has proven an exceptional rate of return compared to most other advertising venues available to local businesses."</p>
+        <div class="attr">— Jack Scotto, President, US Guest Services, LLC</div>
+      </div>
+
+      <div class="section-label">Exposed to the Best</div>
+      <div class="callout callout-burgundy">
+        <h3 style="color:var(--gold)">Hilton · Marriott · Hampton Inn · Home2 Suites<br>Hilton Garden Inn · Holiday Inn · and more</h3>
+        <p>Our directories are placed in premium hotel properties across the country</p>
+        <p style="font-size:.8rem;opacity:.7">Where guests are ready to spend — and looking for recommendations</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- PAGE 10: Q&A -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" data-page="10">
+  <div class="page">
+    <div class="page-header"><h1>Questions &amp; Answers</h1><p>Everything business owners want to know</p></div>
+    <div style="padding:1.5rem 0">
+      <div class="qa-item"><div class="qa-q">What does it cost?</div><div class="qa-a">Advertising starts as low as $795 per year — just $66.25/month for year-round exposure to thousands of hotel guests. Rates vary by market and ad size.</div></div>
+      <div class="qa-item"><div class="qa-q">How long is my commitment?</div><div class="qa-a">Agreements are typically 1 year. Most clients renew because the results speak for themselves.</div></div>
+      <div class="qa-item"><div class="qa-q">How soon does my ad appear?</div><div class="qa-a">Approximately 45–60 days after all ads are received. Digital listings go live even sooner.</div></div>
+      <div class="qa-item"><div class="qa-q">I already get business from the hotel.</div><div class="qa-a">Great — the directory makes that even stronger. When hotel staff has your listing in hand, they recommend you more often and with more confidence.</div></div>
+      <div class="qa-item"><div class="qa-q">My advertising budget is already spent.</div><div class="qa-a">At less than $67/month, this is one of the most affordable year-round options available — often less than a single newspaper ad. Many clients shift budget from less-effective channels.</div></div>
+      <div class="qa-item"><div class="qa-q">I'm not sure about the ROI.</div><div class="qa-a">Even 1–2 new customers per day from the directory means 365–730 new customers per year. What is each new customer worth to your business?</div></div>
+      <div class="qa-item"><div class="qa-q">Why is this better than other advertising?</div><div class="qa-a">Most ads reach people who aren't ready to buy. Hotel guests are away from home, actively looking for businesses like yours, and spending $313/day on average.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- PAGE 11: RATE CARD -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" data-page="11">
+  <div class="page">
+    <div class="page-header"><h1>Advertising Rates</h1><p>Up to 12 Hotels — Professional Ad Design Included</p></div>
+    <div style="padding:1.5rem 0">
+      <table class="rate-table">
+        <thead><tr><th>Ad Size</th><th>Annual Rate</th><th>Monthly</th><th>Per Hotel/Month</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Quarter Page</strong></td><td class="price">$795</td><td>$66.25</td><td>$8.30</td></tr>
+          <tr><td><strong>Half Page</strong></td><td class="price">$895</td><td>$74.60</td><td>$9.35</td></tr>
+          <tr><td><strong>Full Page</strong></td><td class="price">$995</td><td>$83.00</td><td>$10.40</td></tr>
+        </tbody>
+      </table>
+
+      <ul class="bullet-list">
+        <li>Rates include professional ad design — no design fees</li>
+        <li>Front Desk Guest Books, Ad Design, and Handout Maps included for up to 7 hotels</li>
+        <li>One-time setup fee: $35–$40 per ad</li>
+        <li>Rates apply to coverage up to 12 hotels in your market area</li>
+        <li>Prices vary by market — ask about your specific area</li>
+      </ul>
+
+      <div class="callout callout-gold">
+        <h3>Quarter Page = $8.30/hotel/month — Less than a tank of gas!</h3>
+        <p>Reach tens of thousands of hotel guests for less than you'd spend on a local newspaper ad.</p>
+      </div>
+
+      <div class="section-label">What's Included with Every Package</div>
+      <div class="checklist">
+        <div class="check-item">Professional ad design</div>
+        <div class="check-item">Click-to-call functionality</div>
+        <div class="check-item">Print directory placement</div>
+        <div class="check-item">Maps &amp; directions</div>
+        <div class="check-item">Digital listing on whatsaroundtown.info</div>
+        <div class="check-item">Mobile-optimized listing</div>
+        <div class="check-item">Google Reviews integration</div>
+        <div class="check-item">Coverage in up to 12 hotels</div>
+      </div>
+
+      <div class="callout callout-burgundy" style="margin-top:1rem">
+        <h3>Compare: A single newspaper ad costs $200–500 and runs ONE DAY.</h3>
+        <p>WAT gives you 365 days of exposure for less.<br>Print + Digital · Year-round · Up to 12 Hotels · Professional Design Included</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- PAGE 12: GET STARTED -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" data-page="12">
+  <div class="page page-dark" style="display:flex;flex-direction:column">
+    <div style="text-align:center;padding:1.5rem 0 .5rem">
+      <img src="assets/logo-2022-Inverted.png" alt="What's Around Town" style="width:200px;margin-bottom:1rem">
+      <h1 style="font-size:2.2rem;font-weight:800">Ready to Get Started?</h1>
+      <p style="color:var(--gold);font-size:1.1rem;font-weight:600;margin-top:.3rem">Schedule Your FREE Consultation Today!</p>
+      <div style="width:150px;height:2px;background:var(--gold-dark);margin:1rem auto"></div>
+    </div>
+
+    <div class="cta-steps">
+      <div class="cta-step"><div class="num">1</div><h3>Choose Your Ad Size</h3><p>Quarter, Half, or Full Page to fit your budget</p></div>
+      <div class="cta-step"><div class="num">2</div><h3>We Design Your Ad</h3><p>Professional design included at no extra charge</p></div>
+      <div class="cta-step"><div class="num">3</div><h3>Start Reaching Guests</h3><p>Your ad in up to 12 hotels plus digital listing</p></div>
+    </div>
+
+    <div class="contact-card">
+      <div class="name">Jack Scotto</div>
+      <div class="title-line">President, US Guest Services, LLC</div>
+      <div class="contact-info">
+        <a href="tel:4124156156"><span class="label">Cell</span>412-415-6156</a>
+        <a href="tel:4128943320"><span class="label">Office</span>412-894-3320</a>
+        <a href="mailto:usguestservicesllc@gmail.com"><span class="label">Email</span>usguestservicesllc@gmail.com</a>
+      </div>
+      <p style="font-size:.8rem;opacity:.6;margin-top:.8rem">717 Stockton Ridge, Cranberry Twp, PA 16066</p>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:0 1rem;margin-top:auto">
+      <div>
+        <a href="https://whatsaroundtown.info" target="_blank" style="color:var(--gold);font-weight:700;font-size:1rem;text-decoration:none">whatsaroundtown.info</a><br>
+        <a href="https://usguestservices.net" target="_blank" style="color:var(--divider);font-size:.85rem;text-decoration:none">usguestservices.net</a>
+      </div>
+      <div style="text-align:center"><img src="assets/qr-wat.png" alt="QR Code" style="width:80px;border-radius:6px"><p style="font-size:.6rem;opacity:.5;margin-top:.2rem">Scan to visit</p></div>
+    </div>
+
+    <div style="text-align:center;padding:1rem 0 2rem">
+      <p style="color:var(--gold-dark);font-style:italic;font-size:.9rem">Putting Your Business In Front of Guests Who Are Ready to Spend</p>
+      <p style="font-size:.75rem;font-weight:700;opacity:.7;margin-top:.3rem">US Guest Services, LLC · Est. 1999</p>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+
+<script>
+// ── Navigation ──────────────────────────────────────────────
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+let current = 0;
+
+// Build nav dots
+const dotsEl = document.getElementById('navDots');
+for(let i=0;i<total;i++){
+  const d = document.createElement('div');
+  d.className = 'nav-dot' + (i===0?' active':'');
+  d.onclick = ()=>goTo(i);
+  dotsEl.appendChild(d);
+}
+
+function goTo(idx){
+  if(idx<0||idx>=total||idx===current) return;
+  slides[current].classList.remove('active');
+  slides[current].classList.add(idx>current?'prev':'');
+  setTimeout(()=>slides[current===idx?current:current].classList.remove('prev'),400);
+  const old = current;
+  current = idx;
+  slides[current].classList.add('active');
+  slides[current].scrollTop = 0;
+  
+  // Reset prev class on old slide
+  setTimeout(()=>{slides[old].classList.remove('prev')},400);
+  
+  // Update dots
+  document.querySelectorAll('.nav-dot').forEach((d,i)=>d.classList.toggle('active',i===current));
+  
+  // Update counter
+  document.getElementById('pageCounter').textContent = (current+1)+' / '+total;
+  
+  // Update arrows
+  document.getElementById('prevBtn').disabled = current===0;
+  document.getElementById('nextBtn').disabled = current===total-1;
+  
+  // Trigger counter animations
+  animateCounters(slides[current]);
+}
+function go(dir){goTo(current+dir)}
+
+// Touch/swipe
+let tx=0,ty=0,swiping=false;
+document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;swiping=true},{passive:true});
+document.addEventListener('touchend',e=>{
+  if(!swiping)return;swiping=false;
+  const dx=e.changedTouches[0].clientX-tx;
+  const dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)*1.5){
+    if(dx<0)go(1);else go(-1);
+  }
+},{passive:true});
+
+// Keyboard
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' ')go(1);
+  if(e.key==='ArrowLeft')go(-1);
+});
+
+// ── Counter Animation ───────────────────────────────────────
+function animateCounters(slide){
+  slide.querySelectorAll('.counter').forEach(el=>{
+    if(el.dataset.animated) return;
+    el.dataset.animated = '1';
+    const target = parseFloat(el.dataset.target);
+    const prefix = el.dataset.prefix||'';
+    const suffix = el.dataset.suffix||'';
+    const isDecimal = el.dataset.decimal==='true';
+    const noComma = el.dataset.noComma==='true';
+    const duration = 1200;
+    const start = performance.now();
+    
+    function tick(now){
+      const elapsed = now - start;
+      const progress = Math.min(elapsed/duration, 1);
+      const eased = 1 - Math.pow(1-progress, 3); // ease out cubic
+      let val = target * eased;
+      
+      if(isDecimal) val = val.toFixed(1);
+      else val = Math.round(val);
+      
+      if(!noComma && !isDecimal && val >= 1000) val = Number(val).toLocaleString();
+      
+      el.textContent = prefix + val + suffix;
+      if(progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+}
+
+// ── Lightbox ────────────────────────────────────────────────
+function openLightbox(frame){
+  const img = frame.querySelector('img');
+  document.getElementById('lightbox-img').src = img.src;
+  document.getElementById('lightbox').classList.add('open');
+}
+
+// ── Interactive ROI Table ───────────────────────────────────
+document.querySelectorAll('.roi-table tbody tr').forEach(row=>{
+  row.style.cursor = 'pointer';
+  row.addEventListener('click',()=>{
+    document.querySelectorAll('.roi-table tbody tr').forEach(r=>r.classList.remove('highlight'));
+    row.classList.toggle('highlight');
+  });
+});
+
+// ── Q&A Toggle ──────────────────────────────────────────────
+document.querySelectorAll('.qa-q').forEach(q=>{
+  q.addEventListener('click',()=>{
+    const a = q.nextElementSibling;
+    const isOpen = a.style.maxHeight;
+    // close all
+    document.querySelectorAll('.qa-a').forEach(el=>{el.style.maxHeight='';el.style.padding=''});
+    if(!isOpen){
+      a.style.maxHeight = a.scrollHeight+'px';
+    }
+  });
+});
+
+// Init: animate first slide counters
+setTimeout(()=>animateCounters(slides[0]),500);
+document.getElementById('prevBtn').disabled = true;
+</script>
+</body>
+</html>
